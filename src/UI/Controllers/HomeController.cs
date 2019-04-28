@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UI.Models;
 
@@ -10,20 +12,39 @@ namespace UI.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IImageUploader _imageUploader;
+        private readonly IImageDownloader _imageDownloader;
+
+        public HomeController(IImageUploader imageUploader)
+        {
+            _imageUploader = imageUploader;
+            //_imageDownloader = imageDownloader;
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        [HttpPost]
+        public async Task UploadImage(string imageName, string imageDescription){
+            try
+            {
+                var files = Request.Form.Files;
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                if (files.Count > 1)
+                {
+                    throw new Exception("Necessário realizar um upload de cada vez.");
+                }
+
+                var formFile = files.First();
+                var result = await _imageUploader.UploadImage(formFile, imageName, imageDescription);
+                
+            }
+            catch (Exception e)
+            {                
+                throw;
+            }
         }
     }
 }

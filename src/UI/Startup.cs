@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Classes;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Repository.Classes;
+using Repository.DatabaseContexts;
 
 namespace UI
 {
@@ -30,8 +35,10 @@ namespace UI
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-
+            
+            services.AddDbContext<ImageContext>(options => options.UseInMemoryDatabase("Images"));
+            services.AddTransient<IImageRepository, ImageDataAccess>();
+            services.AddTransient<IImageUploader, ImageUploadService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

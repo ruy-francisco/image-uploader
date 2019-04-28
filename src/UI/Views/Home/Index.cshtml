@@ -2,7 +2,24 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@using (Html.BeginForm("UploadImage", "Home", FormMethod.Post, new { enctype = "multipart/form-data"}))
+{
+    <div class="row center">
+        <fieldset>  
+            <legend>Faça upload da sua image (somente PNG)</legend>  
+    
+            @Html.Label("Nome da imagem:")  
+            @Html.TextBox("imageName")<br />        
+            @Html.Label("Descriçao da imagem:")  
+            @Html.TextArea("imageDescription")<br />
+
+            Upload de Imagem: <input type="file" name="chosenImage" /> <br/>
+            <span class="field-validation-valid text-danger" 
+                        data-valmsg-for="chosenImage" 
+                        data-valmsg-replace="true">Nes</span><br/>
+            <p>  
+                <input type="submit" value="Upload" />                
+            </p>
+        </fieldset> 
+    </div>    
+}
