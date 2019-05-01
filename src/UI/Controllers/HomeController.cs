@@ -23,6 +23,7 @@ namespace UI.Controllers
             _imageUploader = imageUploader;
             _imageDownloader = imageDownloader;
             _imageManager = imageManager;
+            _imageManager.ClearAllImages();
         }
 
         public IActionResult Index(string errorMessage, bool returnedError = false)

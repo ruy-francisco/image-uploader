@@ -16,6 +16,17 @@ namespace Core.Classes
             _repository = repository;
         }
 
+        public void ClearAllImages()
+        {
+            var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images");
+            var imageDirectoryInfo = new DirectoryInfo(imagePath);
+
+            foreach (var image in imageDirectoryInfo.GetFiles())
+            {
+                image.Delete();
+            }
+        }
+
         public async Task DeleteImage(Image image){
             await _repository.DeleteImage(image);
             DeleteFromDiks(image);

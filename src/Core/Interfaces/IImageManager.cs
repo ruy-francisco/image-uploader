@@ -8,5 +8,6 @@ namespace Core.Interfaces
     {
         Task DeleteImage(Image image);
         List<Image> ListImages();
+        void ClearAllImages();
     }
 }
