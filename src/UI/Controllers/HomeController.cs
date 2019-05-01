@@ -57,6 +57,12 @@ namespace UI.Controllers
                 }
 
                 var formFile = files.First();
+
+                if (!ImageIs200x200(formFile))
+                {
+                    throw new Exception("A imagem deve ser do tamanho 200px por 200px.");
+                }
+
                 var result = await _imageUploader.UploadImage(formFile, imageName, imageDescription);                
             }
             catch (Exception e)
@@ -67,6 +73,14 @@ namespace UI.Controllers
             }
 
             return RedirectToAction("Index", new { errorMessage = "" });
+        }
+
+        private bool ImageIs200x200(IFormFile formFile)
+        {
+            using (var image = System.Drawing.Image.FromStream(formFile.OpenReadStream()))
+            {
+                return image.Width == 200 && image.Height == 200;
+            }
         }
 
         public async Task<IActionResult> DeleteImage(int id){
@@ -83,7 +97,7 @@ namespace UI.Controllers
                 var image = listOfImages.Find(i => i.Id == id);
                 var imageByteArray = await _imageDownloader.Download(image);
 
-                return File(imageByteArray, "application/octet-stream");       
+                return File(imageByteArray, "application/octet-stream", string.Concat(image.Name, ".png"));       
             }
             catch (Exception e)
             {
