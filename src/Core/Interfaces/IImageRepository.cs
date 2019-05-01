@@ -8,6 +8,7 @@ namespace Core.Interfaces
     {
          int AmountOfFiles { get; }
          Task<int> AddImage(Image image);
-         Task<List<Image>> DeleteImage(Image image);
+         Task DeleteImage(Image image);
+         List<Image> ListImages();
     }
 }

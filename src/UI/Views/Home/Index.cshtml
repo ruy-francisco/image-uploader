@@ -8,18 +8,45 @@
         <fieldset>  
             <legend>Faça upload da sua image (somente PNG)</legend>  
     
-            @Html.Label("Nome da imagem:")  
+            @Html.Label("Nome da imagem:")<br/> 
             @Html.TextBox("imageName")<br />        
-            @Html.Label("Descriçao da imagem:")  
-            @Html.TextArea("imageDescription")<br />
+            @Html.Label("Descriçao da imagem:")<br/> 
+            @Html.TextArea("imageDescription", new { cols = 40 })<br /><br/>
 
-            Upload de Imagem: <input type="file" name="chosenImage" /> <br/>
-            <span class="field-validation-valid text-danger" 
+            Imagem: <input type="file" name="chosenImage" /> <br/>
+            <br/>
+            <p><input type="submit" value="Upload" /></p>
+            @if(ViewBag.returnedError) {
+                <span class="field-validation-valid text-danger" 
                         data-valmsg-for="chosenImage" 
-                        data-valmsg-replace="true">Nes</span><br/>
-            <p>  
-                <input type="submit" value="Upload" />                
-            </p>
-        </fieldset> 
-    </div>    
+                        data-valmsg-replace="true">@ViewBag.errorMessage</span><br/><br/>
+            }
+        </fieldset>
+    </div>
+    
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Descriçao</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var image in ViewBag.images) {
+                    <tr>
+                        <th scope="row"></th>
+                        <td>@image.Name</td>
+                        <td>@image.Description</td>
+                        <td>
+                            @Html.ActionLink("Download", "DownloadImage", "Home", new { id = @image.Id }) | 
+                            @Html.ActionLink("Excluir", "DeleteImage", "Home", new { id = @image.Id })
+                        </td>    
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

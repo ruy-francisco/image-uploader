@@ -39,6 +39,8 @@ namespace UI
             services.AddDbContext<ImageContext>(options => options.UseInMemoryDatabase("Images"));
             services.AddTransient<IImageRepository, ImageDataAccess>();
             services.AddTransient<IImageUploader, ImageUploadService>();
+            services.AddTransient<IImageDownloader, ImageDownloadService>();
+            services.AddTransient<IImageManager, ImageManagementService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

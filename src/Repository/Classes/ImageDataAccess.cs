@@ -20,11 +20,12 @@ namespace Repository.Classes
             return await _imageContext.SaveChangesAsync();
         }
 
-        public async Task<List<Image>> DeleteImage(Image image)
+        public async Task DeleteImage(Image image)
         {
             _imageContext.Remove(image);
             await _imageContext.SaveChangesAsync();
-            return _imageContext.Images.ToList();
         }
+
+        public List<Image> ListImages() => _imageContext.Images.ToList();
     }
 }

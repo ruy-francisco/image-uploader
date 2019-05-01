@@ -1,7 +1,8 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
-using Core.Entities;
+using CustomEntities = Core.Entities;
 using Core.Extension;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -26,38 +27,48 @@ namespace Core.Classes
 
             if (inputImage.IsPng())
             {                
-                var imagePath = await SaveImageInDisk(inputImage, imageName);
-
-                var image = new Image {
-                    Name = imageName,
-                    Description = imageDescription,
-                    Path = imagePath
-                };
-
-                await _repository.AddImage(image);
+                var imagePath = await SaveImageInDisk(inputImage, imageName, imageDescription);
                 return "Upload feito com sucesso";
             }
 
             throw new Exception("Formato da imagem incorreto. \nImagem deve ter formato PNG");
         }
 
-        public async Task<string> SaveImageInDisk(IFormFile inputImage, string imageName)
+        public async Task<string> SaveImageInDisk(IFormFile inputImage, string imageName, string imageDescription)
         {
+            string completeImagePath = string.Empty;
+
             try
             {
                 var imageExtension = string.Format(".{0}", inputImage.ContentType.Substring(6, 3));
                 var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images");
 
-                using (var imageBits = new FileStream(imagePath, FileMode.Create))
+                completeImagePath = Path.Combine(imagePath, string.Concat(imageName, imageExtension));
+
+                if (!File.Exists(completeImagePath))
                 {
-                    await inputImage.CopyToAsync(imageBits);
+                    var image = new CustomEntities.Image {
+                        Name = imageName,
+                        Description = imageDescription,
+                        Path = imagePath
+                    };
+
+                    await _repository.AddImage(image);
+                }                 
+
+                using (var fileStream = File.Create(completeImagePath))
+                {
+                    await inputImage.CopyToAsync(fileStream);
+                    
+                    var byteLength = fileStream.Length;
+                    await fileStream.WriteAsync(new byte[] {}, 0, (int) byteLength);
                 }
 
-                return imagePath;
+                return completeImagePath;
             }
             catch (Exception e)
             {                
-                return e.Message;
+                return completeImagePath;
             }
         }
     }
