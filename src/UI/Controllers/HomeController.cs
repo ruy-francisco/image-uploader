@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Entities;
+using Core.Exceptions;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,31 +43,31 @@ namespace UI.Controllers
             {
                 if (string.IsNullOrEmpty(imageName) || string.IsNullOrEmpty(imageDescription))
                 {
-                    throw new Exception("Os campos Nome da Imagem e Descrição da Imagem são obrigatórios.");
+                    throw new CustomUploadException("Os campos Nome da Imagem e Descrição da Imagem são obrigatórios.");
                 }
 
                 var files = Request.Form.Files;
 
                 if (files.Count == 0)
                 {
-                    throw new Exception("Necessário selectionar arquivo para upload.");
+                    throw new CustomUploadException("Necessário selecionar arquivo para upload.");
                 }
 
                 if (files.Count > 1)
                 {
-                    throw new Exception("Necessário realizar um upload de cada vez.");
+                    throw new CustomUploadException("Necessário realizar um upload de cada vez.");
                 }
 
                 var formFile = files.First();
 
                 if (!ImageIs200x200(formFile))
                 {
-                    throw new Exception("A imagem deve ser do tamanho 200px por 200px.");
+                    throw new CustomUploadException("A imagem deve ser do tamanho 200px por 200px.");
                 }
 
                 var result = await _imageUploader.UploadImage(formFile, imageName, imageDescription);                
             }
-            catch (Exception e)
+            catch (CustomUploadException e)
             {        
                 ViewBag.returnedError = true;
                 ViewBag.errorMessage = e.Message;

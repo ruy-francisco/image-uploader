@@ -79,7 +79,7 @@ namespace Tests.UI
             var errorMessage = redirectResult.RouteValues.Values.First();
             
             //Assert
-            Assert.Equal(errorMessage, "Os campos Nome da Imagem e Descrição da Imagem são obrigatórios.");
+            Assert.Equal("Os campos Nome da Imagem e Descrição da Imagem são obrigatórios.", errorMessage);
         }
 
         [Fact]
@@ -95,12 +95,75 @@ namespace Tests.UI
             var errorMessage = redirectResult.RouteValues.Values.First();
             
             //Assert
-            Assert.Equal(errorMessage, "Necessário selectionar arquivo para upload.");
+            Assert.Equal("Necessário selecionar arquivo para upload.", errorMessage);
+        }
+
+        [Fact]
+        public async void UploadImage_MoreThanOneFile_Should_ReturnsErrorMessage(){
+            //Arrange
+            var homeController = new HomeController(_imageUploader.Object, _imageDownloader.Object, _imageManager.Object){
+                ControllerContext = CreateManyFilesControllerContextMock()
+            };
+            
+            //Act
+            var result = await homeController.UploadImage("Imagem", "Descrição");
+            var redirectResult = result as RedirectToActionResult;
+            var errorMessage = redirectResult.RouteValues.Values.First();
+            
+            //Assert
+            Assert.Equal("Necessário realizar um upload de cada vez.", errorMessage);
+        }
+
+        [Fact]
+        public async void DownloadImage_Should_Success(){
+            //Arrange
+            _imageManager
+                .Setup(s => s.ListImages())
+                .Returns(new List<Image>(){
+                    new Image{
+                        Id = 1,
+                        Name = "TestImage",
+                        Description = "Description",
+                        Path = string.Empty
+                    }
+                });
+
+            _imageDownloader
+                .Setup(s => s.Download(It.IsAny<Image>()))
+                .Returns(Task.Run(() => new byte[] {}));
+
+            //Act
+            var homeController = new HomeController(_imageUploader.Object, _imageDownloader.Object, _imageManager.Object);
+            var result = await homeController.DownloadImage(1);
+            var actionResult = result as FileResult;
+
+            //Assert
+            Assert.NotNull(actionResult);
         }
 
         private ControllerContext CreateNoFileControllerContextMock(){
             var formFileCollectionMock = new Mock<IFormFileCollection>();
             formFileCollectionMock.SetupGet(f => f.Count).Returns(0);
+
+            var formCollectionMock = new Mock<IFormCollection>();
+            formCollectionMock.SetupGet(f => f.Files).Returns(formFileCollectionMock.Object);
+
+            var httpRequestMock = new Mock<HttpRequest>();
+            httpRequestMock.SetupGet(h => h.Form).Returns(formCollectionMock.Object);
+
+            var httpContextMock = new Mock<HttpContext>();
+            httpContextMock.SetupGet(h => h.Request).Returns(httpRequestMock.Object);
+
+            var controllerContext = new ControllerContext {
+                HttpContext = httpContextMock.Object
+            };
+
+            return controllerContext;
+        }
+
+        private ControllerContext CreateManyFilesControllerContextMock(){
+            var formFileCollectionMock = new Mock<IFormFileCollection>();
+            formFileCollectionMock.SetupGet(f => f.Count).Returns(2);
 
             var formCollectionMock = new Mock<IFormCollection>();
             formCollectionMock.SetupGet(f => f.Files).Returns(formFileCollectionMock.Object);

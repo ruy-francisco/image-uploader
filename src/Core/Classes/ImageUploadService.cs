@@ -66,7 +66,7 @@ namespace Core.Classes
 
                 return completeImagePath;
             }
-            catch (Exception e)
+            catch (Exception)
             {                
                 return completeImagePath;
             }
