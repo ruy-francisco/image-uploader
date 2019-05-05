@@ -6,6 +6,7 @@ using CustomEntities = Core.Entities;
 using Core.Extension;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Core.Exceptions;
 
 namespace Core.Classes
 {
@@ -22,7 +23,7 @@ namespace Core.Classes
         {
             if (_repository.AmountOfFiles == 8)
             {
-                throw new Exception("Número máximo (8) de upload alcançado.");
+                throw new CustomUploadException("Número máximo (8) de upload alcançado.");
             }
 
             if (inputImage.IsPng())
@@ -31,7 +32,7 @@ namespace Core.Classes
                 return "Upload feito com sucesso";
             }
 
-            throw new Exception("Formato da imagem incorreto. \nImagem deve ter formato PNG");
+            throw new CustomUploadException("Formato da imagem incorreto. \nImagem deve ter formato PNG");
         }
 
         public async Task<string> SaveImageInDisk(IFormFile inputImage, string imageName, string imageDescription)
