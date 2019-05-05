@@ -47,7 +47,7 @@ namespace UI.Controllers
 
                 var files = Request.Form.Files;
 
-                if (!files.Any())
+                if (files.Count == 0)
                 {
                     throw new Exception("Necessário selectionar arquivo para upload.");
                 }
